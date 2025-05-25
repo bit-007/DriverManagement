@@ -1,0 +1,67 @@
+/* FRONTPAGE*/
+
+
+
+/* General Styles */
+body {
+    margin: 0;
+    font-family: 'Copperplate', 'Cinzel', Fantasy;
+
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: url('/Users/nityareddy/Desktop/Recovered_Desktop/CS/Proformainvoice/backend/images/auto.png') no-repeat center center; /* Sets the background image */
+    background-size: cover; /* Ensures the image covers the entire background */
+    color: white;
+    
+}
+
+/* Content styles */
+.content {
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.5); /* Adds a translucent background for better text visibility */
+    padding: 20px;
+    border-radius: 10px;
+}
+
+h1 {
+    color:#edf1e9;
+    font-size: 70px; /* Sets font size to 20 pixels */
+}
+
+
+p {
+    color:#edf1e9;
+    font-size: 25px; /* Sets font size to 20 pixels */
+}
+
+.taskbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Translucent background */
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Slight shadow for depth */
+    z-index: 1000;
+}
+
+.taskbar a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    margin: 0 15px;
+    transition: color 0.3s ease;
+}
+
+.taskbar a:hover {
+    color: #ccd5ae; /* Light greenish color on hover */
+}
+
+
+

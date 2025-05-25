@@ -1,0 +1,112 @@
+/*login*/
+
+/* General Reset */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Arial, sans-serif;
+}
+
+/* Body background */
+body {
+    background-color: #212529;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+
+
+
+
+
+
+/*importing fonts*/
+
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Inter:opsz,wght@14..32,100..900&display=swap');
+
+.contain{
+    margin:0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+    position: absolute;
+    top: 50px;
+    left: 100px;
+    
+
+
+}
+
+.card-list .card-item .card-link {
+    user-select: none;
+    display: block;
+    background: #ced4da;
+    padding: 30px;
+    border-radius: 30px;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+
+.card-list .card-item .card-link:hover{
+    background: #ccd5ae;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.card-list .card-link .badge{
+    color: black;
+    background:white ;
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 8px 16px;
+    margin: 16px 0 18px;
+    width: fit-content;
+    border-radius: 50px;
+}
+
+.card-list .card-link .card-title{
+    font-size: 1.19rem;
+    color: black;
+    font-weight: 600;
+
+}
+
+.card-list .card-link .card-button{
+    height: 35px;
+    width: 35px;
+    color: black;
+    border-radius: 50%;
+    margin: 30px 0 5px;
+    background: none;
+    cursor: pointer;
+    border: 2px solid black;
+    transform: rotate(-45deg);
+
+
+}
+
+.card-list .card-link:hover .card-button{
+    color: white;
+    background: #ccd5ae;
+}
+
+
+.swiper {
+    width: 1100px;
+    height: 500px;
+  }
+
+
+.title{
+    font-size: 50x;
+    color: #ced4da;
+    text-align: center;
+
+}
+
+
+
+

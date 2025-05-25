@@ -1,0 +1,87 @@
+/* SUBSCRIBE*/
+
+body {
+    font-family: Arial, Serif;
+    margin: 0;
+    padding: 0;
+    background-color: #212529; 
+    color: #333;
+    text-align: center;
+}
+
+h1 {
+    margin: 20px 0;
+    color: #fff;
+}
+
+/* Container for Plans */
+.container {
+    padding: 40px;
+}
+
+.plans {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Vertically centers items */
+    gap: 70px; /* Increased gap for better spacing */
+    margin-top: 20px;
+    flex-wrap: wrap; /* Ensures proper layout for smaller screens */
+}
+
+.plan {
+    background-color: #ced4da; /* Light teal */
+    border-radius: 10px;
+    padding: 30px; /* Increased padding for larger content space */
+    width: 300px; /* Increased width for bigger plans */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Enhanced shadow for better contrast */
+    transition: transform 0.3s ease;
+}
+
+/* Hover Effect */
+.plan:hover {
+    transform: translateY(-10px);
+}
+
+/* Plan Title */
+.plan h2 {
+    margin: 0;
+    color: #5e503f;
+    font-size: 22px; /* Slightly larger title */
+}
+
+/* Plan Description */
+.plan p {
+    font-size: 16px; /* Increased font size */
+    color: #5e503f;
+    margin: 10px 0;
+}
+
+/* Plan Price */
+.plan h3 {
+    font-size: 28px; /* Increased font size */
+    color: #5e503f;
+    margin: 15px 0;
+}
+
+/* Subscribe Button */
+.plan button {
+    background-color: whitesmoke; /* Dark teal */
+    color: #5e503f;
+    border: none;
+    padding: 12px 25px; /* Bigger button size */
+    font-size: 18px; /* Slightly larger font size */
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.plan button:hover {
+    background-color: #f5ebe0;
+}
+
+
+
+
+
+
+
