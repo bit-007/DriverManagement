@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { API_BASE_URL } from '../config/api';
 
 const Subscribe = () => {
   const [formData, setFormData] = useState({
@@ -14,7 +15,7 @@ const Subscribe = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const result = await axios.post('/Subscribe', {
+      const result = await axios.post('${API_BASE_URL}/Subscribe', {
         phone: formData.phone,
         subscriptionAmount: parseInt(formData.subscriptionAmount, 10)
       });

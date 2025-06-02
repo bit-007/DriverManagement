@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { API_BASE_URL } from '../config/api';
 
 const AddDriver = () => {
   const [formData, setFormData] = useState({
@@ -15,7 +16,7 @@ const AddDriver = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const result = await axios.post('/AddDriver', {
+      const result = await axios.post('${API_BASE_URL}/AddDriver', {
         name: formData.name,
         phone: formData.phone,
         licenseNumber: formData.licenseNumber

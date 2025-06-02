@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { API_BASE_URL } from '../config/api';
 
 const GetDriver = () => {
   const [name, setName] = useState('');
@@ -11,7 +12,7 @@ const GetDriver = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const result = await axios.get(`/DriverByName/${name}`);
+      const result = await axios.get(`${API_BASE_URL}/DriverByName/${name}`);
       setResponse(JSON.stringify(result.data, null, 2));
     } catch (error) {
       setResponse(error.response ? JSON.stringify(error.response.data, null, 2) : error.message);

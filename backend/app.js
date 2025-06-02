@@ -389,6 +389,36 @@ app.get('/health', (req, res) => {
   }
 });
 
+app.get('/', (req, res) => {
+  res.json({
+    message: 'EnergyHive Backend API is running! 🚀',
+    name: 'EnergyHive Driver Management API',
+    version: '1.0.0',
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    description: 'RESTful API for driver management system with subscription and payment features',
+    endpoints: {
+      'POST /AddDriver': 'Add a new driver',
+      'GET /DriverByName/:name': 'Get driver by name',
+      'POST /MultipleByName': 'Get multiple drivers by names',
+      'GET /Balance/:phone': 'Check driver balance',
+      'POST /PayBalance/:phone': 'Pay driver balance',
+      'POST /Subscribe': 'Add subscription balance',
+      'GET /TransactionHistory/:phone': 'Get transaction history',
+      'GET /health': 'Health check endpoint',
+      'GET /api/info': 'API information'
+    },
+    database: {
+      type: 'MongoDB',
+      status: isConnected ? 'connected' : 'disconnected'
+    },
+    links: {
+      health: '/health',
+      apiInfo: '/api/info'
+    }
+  });
+});
+
 // API info endpoint
 app.get('/api/info', (req, res) => {
   res.json({

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { API_BASE_URL } from '../config/api';
 
 const Payment = () => {
   const [checkDuesPhone, setCheckDuesPhone] = useState('');
@@ -17,7 +18,7 @@ const Payment = () => {
     e.preventDefault();
     setLoading({ ...loading, checkDues: true });
     try {
-      const result = await axios.get(`/Balance/${checkDuesPhone}`);
+      const result = await axios.get(`${API_BASE_URL}/Balance/${checkDuesPhone}`);
       setCheckDuesResponse(JSON.stringify(result.data, null, 2));
     } catch (error) {
       setCheckDuesResponse(error.response ? JSON.stringify(error.response.data, null, 2) : error.message);
@@ -30,7 +31,7 @@ const Payment = () => {
     e.preventDefault();
     setLoading({ ...loading, payment: true });
     try {
-      const result = await axios.post(`/PayBalance/${paymentData.phone}`, {
+      const result = await axios.post(`${API_BASE_URL}/PayBalance/${paymentData.phone}`, {
         paymentAmount: paymentData.payOption === 'partial' ? paymentData.amount : null,
         paymentType: paymentData.payOption
       });
