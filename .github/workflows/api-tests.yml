@@ -2,9 +2,9 @@ name: Run API Tests
 
 on:
   push:
-    branches: [main]
+    branches: [pranshu]
   pull_request:
-    branches: [main]
+    branches: [pranshu]
 
 jobs:
   test:
