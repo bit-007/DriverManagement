@@ -15,7 +15,7 @@ const AddDriver = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const result = await axios.post('http://localhost:3000/AddDriver', {
+      const result = await axios.post('http://localhost:3001/AddDriver', {
         name: formData.name,
         phone: formData.phone,
         licenseNumber: formData.licenseNumber

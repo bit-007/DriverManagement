@@ -17,7 +17,7 @@ const Payment = () => {
     e.preventDefault();
     setLoading({ ...loading, checkDues: true });
     try {
-      const result = await axios.get(`http://localhost:3000/Balance/${checkDuesPhone}`);
+      const result = await axios.get(`http://localhost:3001/Balance/${checkDuesPhone}`);
       setCheckDuesResponse(JSON.stringify(result.data, null, 2));
     } catch (error) {
       setCheckDuesResponse(error.response ? JSON.stringify(error.response.data, null, 2) : error.message);
