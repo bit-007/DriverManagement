@@ -1,10 +1,8 @@
 version: '3.8'
 services:
-  # Backend Service
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: energyhive-backend:latest  # Use Jenkins-built image
+    # Remove the build section
     container_name: energyhive-backend-v2
     ports:
       - "3000:3000"
@@ -24,11 +22,9 @@ services:
       timeout: 10s
       retries: 3
 
-  # Frontend Service
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: energyhive-frontend:latest  # Use Jenkins-built image
+    # Remove the build section
     container_name: energyhive-frontend-v2
     ports:
       - "80:80"
