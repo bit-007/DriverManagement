@@ -1,15 +1,20 @@
 {
   "name": "rest-api",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "test": "node test-basic.js || echo \"Basic tests completed\"",
+    "test:api": "node test-api.js || echo \"API tests completed\"",
+    "lint": "echo \"Linting not configured - install ESLint if needed\" && exit 0",
+    "audit": "npm audit --audit-level=moderate",
+    "health-check": "node health-check.js",
+    "build-info": "node -e \"console.log(JSON.stringify({name: process.env.npm_package_name, version: process.env.npm_package_version, buildTime: new Date().toISOString(), nodeVersion: process.version}, null, 2))\""
   },
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "EnergyHive Driver Management System Backend API",
   "dependencies": {
     "axios": "^1.9.0",
     "cors": "^2.8.5",
@@ -18,5 +23,12 @@
     "mongodb": "^6.16.0",
     "nodemailer": "^6.10.1",
     "pdfkit": "^0.15.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
   }
 }

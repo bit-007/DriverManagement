@@ -345,6 +345,101 @@ app.get("/TransactionHistory/:phone", async (request, response) => {
   }
 });
 
+// Add this health endpoint to your backend/app.js file
+// Place it with your other route definitions
+
+// Health check endpoint for monitoring and CD pipeline
+app.get('/health', (req, res) => {
+  try {
+    const healthInfo = {
+      status: 'OK',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      memory: {
+        used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024) + ' MB',
+        total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024) + ' MB'
+      },
+      version: '1.0.0',
+      environment: process.env.NODE_ENV || 'development',
+      port: process.env.PORT || 3000,
+      database: isConnected ? 'connected' : 'disconnected',
+      services: {
+        mongodb: isConnected ? 'healthy' : 'unhealthy',
+        nodemailer: 'configured',
+        pdfkit: 'available'
+      },
+      endpoints: [
+        '/AddDriver',
+        '/DriverByName/:name',
+        '/Balance/:phone',
+        '/PayBalance/:phone',
+        '/Subscribe',
+        '/TransactionHistory/:phone',
+        '/MultipleByName'
+      ]
+    };
+    
+    res.status(200).json(healthInfo);
+  } catch (error) {
+    res.status(500).json({
+      status: 'ERROR',
+      timestamp: new Date().toISOString(),
+      error: error.message
+    });
+  }
+});
+
+// API info endpoint
+app.get('/api/info', (req, res) => {
+  res.json({
+    name: 'EnergyHive Driver Management API',
+    version: '1.0.0',
+    description: 'RESTful API for driver management system with subscription and payment features',
+    endpoints: {
+      'POST /AddDriver': 'Add a new driver',
+      'GET /DriverByName/:name': 'Get driver by name', 
+      'POST /MultipleByName': 'Get multiple drivers by names',
+      'GET /Balance/:phone': 'Check driver balance',
+      'POST /PayBalance/:phone': 'Pay driver balance',
+      'POST /Subscribe': 'Add subscription balance',
+      'GET /TransactionHistory/:phone': 'Get transaction history',
+      'GET /health': 'Health check endpoint',
+      'GET /api/info': 'API information'
+    },
+    database: {
+      type: 'MongoDB',
+      status: isConnected ? 'connected' : 'disconnected'
+    }
+  });
+});
+
+// Graceful shutdown handlers for PM2 and Docker
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  if (client) {
+    client.close();
+  }
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully');
+  if (client) {
+    client.close();
+  }
+  process.exit(0);
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
+});
 
 
 // Export the app instance

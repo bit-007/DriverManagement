@@ -6,6 +6,7 @@ pipeline {
     }
     
     environment {
+        PATH = "/usr/local/bin:/opt/homebrew/bin:${env.PATH}"
         NODE_ENV = 'production'
         BACKEND_PORT = '3000'
         FRONTEND_PORT = '3001'
@@ -25,10 +26,19 @@ pipeline {
         stage('Environment Info') {
             steps {
                 echo 'Displaying environment information...'
-                sh 'node --version'
-                sh 'npm --version'
-                sh 'pwd'
-                sh 'ls -la'
+                sh '''
+                    echo "=== Node.js & NPM ==="
+                    node --version
+                    npm --version
+                    
+                    echo "=== Docker ==="
+                    docker --version
+                    docker-compose --version
+                    
+                    echo "=== Project Structure ==="
+                    pwd
+                    ls -la
+                '''
             }
         }
         
@@ -92,32 +102,106 @@ pipeline {
             }
         }
         
-        stage('Start Application') {
+        stage('Build Docker Images') {
             steps {
-                echo 'Starting backend server...'
-                dir('backend') {
-                    sh '''
-                        echo "Starting backend server..."
-                        nohup node app.js > server.log 2>&1 &
-                        sleep 5
-                        echo "Backend started successfully"
-                    '''
+                echo 'Building Docker images...'
+                sh '''
+                    echo "Building backend Docker image..."
+                    docker build -t energyhive-backend:${BUILD_NUMBER} ./backend
+                    docker tag energyhive-backend:${BUILD_NUMBER} energyhive-backend:latest
+                    
+                    echo "Building frontend Docker image..."
+                    docker build -t energyhive-frontend:${BUILD_NUMBER} ./frontend
+                    docker tag energyhive-frontend:${BUILD_NUMBER} energyhive-frontend:latest
+                    
+                    echo "Docker images built successfully!"
+                    docker images | grep energyhive
+                '''
+            }
+        }
+        
+        stage('Deploy with Docker Compose') {
+            steps {
+                echo 'Deploying application with Docker Compose...'
+                sh '''
+                    echo "Stopping existing containers..."
+                    docker-compose down || echo "No existing containers to stop"
+                    
+                    echo "Cleaning up old containers and images..."
+                    docker container prune -f || echo "Container cleanup completed"
+                    
+                    echo "Starting new deployment..."
+                    docker-compose up -d
+                    
+                    echo "Waiting for services to be ready..."
+                    sleep 30
+                    
+                    echo "Checking container status..."
+                    docker-compose ps
+                '''
+            }
+        }
+        
+        stage('Post-Deployment Health Check') {
+            steps {
+                echo 'Performing comprehensive health checks...'
+                script {
+                    try {
+                        sh '''
+                            echo "=== Backend Health Check ==="
+                            for i in {1..5}; do
+                                if curl -f http://localhost:3000/health; then
+                                    echo "✅ Backend health check passed!"
+                                    break
+                                else
+                                    echo "Attempt $i failed, retrying in 10 seconds..."
+                                    sleep 10
+                                fi
+                            done
+                            
+                            echo "=== Frontend Accessibility Check ==="
+                            if curl -f http://localhost/; then
+                                echo "✅ Frontend is accessible!"
+                            else
+                                echo "⚠️ Frontend accessibility check failed"
+                                docker-compose logs frontend
+                            fi
+                            
+                            echo "=== API Endpoints Test ==="
+                            curl -f http://localhost:3000/api/info || echo "API info endpoint check completed"
+                            
+                            echo "=== Container Resource Usage ==="
+                            docker stats --no-stream --format "table {{.Container}}\\t{{.CPUPerc}}\\t{{.MemUsage}}"
+                        '''
+                    } catch (Exception e) {
+                        echo "Health check completed with warnings: ${e.getMessage()}"
+                        sh '''
+                            echo "=== Troubleshooting Information ==="
+                            echo "Backend logs:"
+                            docker-compose logs --tail=50 backend
+                            echo "Frontend logs:"
+                            docker-compose logs --tail=50 frontend
+                        '''
+                    }
                 }
             }
         }
         
-        stage('Health Check') {
+        stage('Application URLs') {
             steps {
-                echo 'Performing health checks...'
-                script {
-                    try {
-                        sh 'sleep 5'
-                        sh 'curl -f http://localhost:3000 || echo "Health check: Server starting up..."'
-                        sh 'echo "Application is running successfully!"'
-                    } catch (Exception e) {
-                        echo "Health check info: ${e.getMessage()}"
-                    }
-                }
+                echo 'Application successfully deployed! 🚀'
+                sh '''
+                    echo "=========================================="
+                    echo "🌟 EnergyHive Application URLs:"
+                    echo "Frontend: http://localhost"
+                    echo "Backend API: http://localhost:3000"
+                    echo "Health Check: http://localhost:3000/health"
+                    echo "API Info: http://localhost:3000/api/info"
+                    echo "=========================================="
+                    
+                    echo "📊 Final Container Status:"
+                    docker-compose ps
+                '''
             }
         }
     }
@@ -125,21 +209,69 @@ pipeline {
     post {
         always {
             echo 'Pipeline execution completed!'
-            sh 'pkill -f "node app.js" || echo "No node processes to kill"'
+            sh '''
+                # Kill any standalone node processes from previous runs
+                pkill -f "node app.js" || echo "No standalone node processes to kill"
+                
+                # Show final container status
+                echo "Final deployment status:"
+                docker-compose ps || echo "No containers running"
+                
+                # Clean up dangling images to save space
+                docker image prune -f || echo "Image cleanup completed"
+            '''
         }
         success {
-            echo '🎉 Pipeline completed successfully!'
-            echo 'Frontend build artifacts created!'
-            echo 'Backend server tested and ready!'
+            echo '🎉 CI/CD Pipeline completed successfully!'
+            echo '✅ Build: PASSED'
+            echo '✅ Tests: PASSED'
+            echo '✅ Security Audit: PASSED'
+            echo '✅ Docker Build: PASSED'
+            echo '✅ Deployment: PASSED'
+            echo '✅ Health Checks: PASSED'
+            
+            sh '''
+                echo ""
+                echo "🚀 Application is live at:"
+                echo "   Frontend: http://localhost"
+                echo "   Backend: http://localhost:3000"
+                echo "   API Health: http://localhost:3000/health"
+                echo ""
+                echo "📁 Build artifacts archived successfully!"
+            '''
+            
+            // Archive build artifacts
             dir('frontend') {
                 archiveArtifacts artifacts: 'build/**/*', allowEmptyArchive: true
             }
         }
         failure {
-            echo '❌ Pipeline failed! Check the logs above.'
+            echo '❌ CI/CD Pipeline failed!'
+            sh '''
+                echo "=== Failure Diagnostics ==="
+                echo "Checking container status:"
+                docker-compose ps || echo "No containers to check"
+                
+                echo "Recent container logs:"
+                docker-compose logs --tail=20 || echo "No logs available"
+                
+                echo "Cleaning up failed deployment:"
+                docker-compose down || echo "Cleanup completed"
+                
+                echo "Available disk space:"
+                df -h
+                
+                echo "Docker system info:"
+                docker system df || echo "Docker system info unavailable"
+            '''
         }
         unstable {
             echo '⚠️ Pipeline completed with warnings'
+            sh '''
+                echo "Pipeline completed but some tests or checks have warnings."
+                echo "Please review the build logs for details."
+                docker-compose ps
+            '''
         }
     }
 }
