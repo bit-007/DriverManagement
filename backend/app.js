@@ -14,7 +14,16 @@ app.use(express.json()); // to use the request body as JSON
 
 // Update CORS for React dev server:
 app.use(cors({
-  origin: 'http://localhost:3001' // React dev server
+  origin: [
+    'http://localhost:3001', // Local development
+    'http://localhost', // Local docker
+    'https://energyhive-frontend.onrender.com', // Your frontend URL
+    'https://energyhive-backend.onrender.com', // Your backend URL
+    'https://your-custom-domain.com' // If you add custom domain
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 let client;
