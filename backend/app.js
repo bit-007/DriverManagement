@@ -440,7 +440,8 @@ app.get('/health', (req, res) => {
         '/PayBalance/:phone',
         '/Subscribe',
         '/TransactionHistory/:phone',
-        '/MultipleByName'
+        '/MultipleByName',
+        '/DeleteDriver/:phone'
       ]
     };
     
@@ -499,6 +500,7 @@ app.get('/api/info', (req, res) => {
       'POST /PayBalance/:phone': 'Pay driver balance',
       'POST /Subscribe': 'Add subscription balance',
       'GET /TransactionHistory/:phone': 'Get transaction history',
+      'DELETE /DeleteDriver/:phone': 'Delete driver by phone',
       'GET /health': 'Health check endpoint',
       'GET /api/info': 'API information'
     },
