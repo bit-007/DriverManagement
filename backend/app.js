@@ -345,8 +345,8 @@ app.get("/TransactionHistory/:phone", async (request, response) => {
   }
 });
 
-// Add this health endpoint to your backend/app.js file
-// Place it with your other route definitions
+
+
 
 // Health check endpoint for monitoring and CD pipeline
 app.get('/health', (req, res) => {
