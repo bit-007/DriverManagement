@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import config from '../config';
 
 const TransactionHistory = () => {
   const [phone, setPhone] = useState('');
@@ -15,7 +16,7 @@ const TransactionHistory = () => {
     setMessage('');
     
     try {
-      const result = await axios.get(`http://localhost:3001/TransactionHistory/${phone}`);
+      const result = await axios.get(`/TransactionHistory/${phone}`);
       
       if (result.data.transactions && result.data.transactions.length > 0) {
         setTransactions(result.data.transactions);

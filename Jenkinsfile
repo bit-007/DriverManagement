@@ -148,9 +148,9 @@ pipeline {
                 script {
                     try {
                         sh '''
-                            echo "=== Backend Health Check ==="
+                            echo "=== Backend Health Check via Nginx Proxy ==="
                             for i in {1..5}; do
-                                if curl -f http://localhost:3000/health; then
+                                if curl -f http://localhost/health; then
                                     echo "✅ Backend health check passed!"
                                     break
                                 else
@@ -167,8 +167,8 @@ pipeline {
                                 docker-compose logs frontend
                             fi
                             
-                            echo "=== API Endpoints Test ==="
-                            curl -f http://localhost:3000/api/info || echo "API info endpoint check completed"
+                            echo "=== API Endpoints Test via Nginx ==="
+                            curl -f http://localhost/health || echo "API health endpoint check completed"
                             
                             echo "=== Container Resource Usage ==="
                             docker stats --no-stream --format "table {{.Container}}\\t{{.CPUPerc}}\\t{{.MemUsage}}"
@@ -194,9 +194,11 @@ pipeline {
                     echo "=========================================="
                     echo "🌟 EnergyHive Application URLs:"
                     echo "Frontend: http://localhost"
-                    echo "Backend API: http://localhost:3000"
-                    echo "Health Check: http://localhost:3000/health"
-                    echo "API Info: http://localhost:3000/api/info"
+                    echo "Backend API (via proxy): http://localhost/health"
+                    echo "Health Check: http://localhost/health"
+                    echo "Transaction History: http://localhost/TransactionHistory/PHONE"
+                    echo "Balance Check: http://localhost/Balance/PHONE"
+                    echo "Add Driver: http://localhost/AddDriver"
                     echo "=========================================="
                     
                     echo "📊 Final Container Status:"
@@ -234,8 +236,8 @@ pipeline {
                 echo ""
                 echo "🚀 Application is live at:"
                 echo "   Frontend: http://localhost"
-                echo "   Backend: http://localhost:3000"
-                echo "   API Health: http://localhost:3000/health"
+                echo "   API Health: http://localhost/health"
+                echo "   API Endpoints: http://localhost/[endpoint]"
                 echo ""
                 echo "📁 Build artifacts archived successfully!"
             '''

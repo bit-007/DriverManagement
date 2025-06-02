@@ -14,7 +14,7 @@ const Subscribe = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const result = await axios.post('http://localhost:3001/Subscribe', {
+      const result = await axios.post('/Subscribe', {
         phone: formData.phone,
         subscriptionAmount: parseInt(formData.subscriptionAmount, 10)
       });

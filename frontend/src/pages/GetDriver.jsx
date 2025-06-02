@@ -11,7 +11,7 @@ const GetDriver = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const result = await axios.get(`http://localhost:3001/DriverByName/${name}`);
+      const result = await axios.get(`/DriverByName/${name}`);
       setResponse(JSON.stringify(result.data, null, 2));
     } catch (error) {
       setResponse(error.response ? JSON.stringify(error.response.data, null, 2) : error.message);

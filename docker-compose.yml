@@ -1,5 +1,4 @@
 version: '3.8'
-
 services:
   # Backend Service
   backend:
@@ -33,26 +32,13 @@ services:
     container_name: energyhive-frontend
     ports:
       - "80:80"
+    environment:
+      - REACT_APP_API_URL=http://localhost:3000
     depends_on:
       - backend
     restart: unless-stopped
     networks:
       - energyhive-network
-
-  # MongoDB (optional local instance)
-  # mongodb:
-  #   image: mongo:6
-  #   container_name: energyhive-mongodb
-  #   ports:
-  #     - "27017:27017"
-  #   environment:
-  #     MONGO_INITDB_ROOT_USERNAME: admin
-  #     MONGO_INITDB_ROOT_PASSWORD: password
-  #   volumes:
-  #     - mongodb_data:/data/db
-  #   restart: unless-stopped
-  #   networks:
-  #     - energyhive-network
 
 networks:
   energyhive-network:
