@@ -7,6 +7,7 @@
     "dev": "nodemon app.js",
     "test": "node test-basic.js || echo \"Basic tests completed\"",
     "test:api": "node test-api.js || echo \"API tests completed\"",
+    "test:api1": "newman run we.postman_collection.json",
     "lint": "echo \"Linting not configured - install ESLint if needed\" && exit 0",
     "audit": "npm audit --audit-level=moderate",
     "health-check": "node health-check.js",
@@ -25,6 +26,7 @@
     "pdfkit": "^0.15.2"
   },
   "devDependencies": {
+    "newman": "^6.2.1",
     "nodemon": "^3.0.0"
   },
   "engines": {
