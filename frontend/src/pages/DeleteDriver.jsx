@@ -19,7 +19,7 @@ const DeleteDriver = () => {
     
     try {
       // First, get driver info to show confirmation
-      const result = await axios.get(`${API_BASE_URL}/DriverByName/${phone}`);
+      const result = await axios.get(`${API_BASE_URL}/DeleteDriver/${phone}`);
       if (result.data.drivers && result.data.drivers.length > 0) {
         setDriverInfo(result.data.drivers[0]);
         setConfirmDelete(true);
