@@ -7,40 +7,16 @@ const DeleteDriver = () => {
   const [phone, setPhone] = useState('');
   const [response, setResponse] = useState('');
   const [loading, setLoading] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
-  const [driverInfo, setDriverInfo] = useState(null);
 
-  const handleCheckDriver = async (e) => {
+  const handleDeleteDriver = async (e) => {
     e.preventDefault();
     setLoading(true);
     setResponse('');
-    setDriverInfo(null);
-    setConfirmDelete(false);
     
-    try {
-      // First, get driver info to show confirmation
-      const result = await axios.get(`${API_BASE_URL}/DeleteDriver/${phone}`);
-      if (result.data.drivers && result.data.drivers.length > 0) {
-        setDriverInfo(result.data.drivers[0]);
-        setConfirmDelete(true);
-      } else {
-        setResponse('Driver not found with this phone number.');
-      }
-    } catch (error) {
-      setResponse(error.response ? JSON.stringify(error.response.data, null, 2) : error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDeleteDriver = async () => {
-    setLoading(true);
     try {
       const result = await axios.delete(`${API_BASE_URL}/DeleteDriver/${phone}`);
       setResponse(JSON.stringify(result.data, null, 2));
-      setConfirmDelete(false);
-      setDriverInfo(null);
-      setPhone('');
+      setPhone(''); // Clear the form after successful deletion
     } catch (error) {
       setResponse(error.response ? JSON.stringify(error.response.data, null, 2) : error.message);
     } finally {
@@ -121,130 +97,66 @@ const DeleteDriver = () => {
         </div>
 
         {/* Form */}
-        {!confirmDelete && (
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.05)',
-            backdropFilter: 'blur(20px)',
-            borderRadius: '24px',
-            padding: '40px',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
-            marginBottom: '30px'
-          }}>
-            <form onSubmit={handleCheckDriver}>
-              <div style={{ textAlign: 'left', marginBottom: '24px' }}>
-                <label style={{
-                  display: 'block',
-                  marginBottom: '12px',
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  color: 'rgba(255, 255, 255, 0.9)'
-                }}>
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '18px',
-                    fontSize: '16px',
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    borderRadius: '12px',
-                    color: 'white',
-                    outline: 'none',
-                    boxSizing: 'border-box'
-                  }}
-                  placeholder="Enter driver's phone number"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.05)',
+          backdropFilter: 'blur(20px)',
+          borderRadius: '24px',
+          padding: '40px',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+          marginBottom: '30px'
+        }}>
+          <form onSubmit={handleDeleteDriver}>
+            <div style={{ textAlign: 'left', marginBottom: '24px' }}>
+              <label style={{
+                display: 'block',
+                marginBottom: '12px',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: 'rgba(255, 255, 255, 0.9)'
+              }}>
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                required
                 style={{
                   width: '100%',
                   padding: '18px',
-                  fontSize: '18px',
-                  fontWeight: '600',
-                  background: loading ? 'rgba(255, 107, 107, 0.5)' : 'linear-gradient(135deg, #ff6b6b, #ff5252)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '12px',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  transition: 'all 0.3s ease'
-                }}
-              >
-                {loading ? 'Searching...' : 'Find Driver'}
-              </button>
-            </form>
-          </div>
-        )}
-
-        {/* Confirmation */}
-        {confirmDelete && driverInfo && (
-          <div style={{
-            background: 'rgba(255, 107, 107, 0.1)',
-            backdropFilter: 'blur(20px)',
-            borderRadius: '24px',
-            padding: '40px',
-            border: '2px solid rgba(255, 107, 107, 0.3)',
-            marginBottom: '30px'
-          }}>
-            <h3 style={{ color: '#ff6b6b', marginBottom: '20px' }}>
-              ⚠️ Confirm Deletion
-            </h3>
-            <div style={{ 
-              background: 'rgba(0, 0, 0, 0.3)',
-              padding: '20px',
-              borderRadius: '12px',
-              marginBottom: '24px',
-              textAlign: 'left'
-            }}>
-              <p><strong>Name:</strong> {driverInfo.name}</p>
-              <p><strong>Phone:</strong> {driverInfo.phone}</p>
-              <p><strong>License:</strong> {driverInfo.licenseNumber}</p>
-              <p><strong>Balance:</strong> ₹{driverInfo.balance}</p>
-            </div>
-            <p style={{ color: 'rgba(255, 255, 255, 0.8)', marginBottom: '24px' }}>
-              This action will permanently delete the driver and all their transaction history. This cannot be undone.
-            </p>
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button
-                onClick={() => setConfirmDelete(false)}
-                style={{
-                  flex: 1,
-                  padding: '12px',
+                  fontSize: '16px',
                   background: 'rgba(255, 255, 255, 0.1)',
                   border: '1px solid rgba(255, 255, 255, 0.2)',
-                  borderRadius: '8px',
+                  borderRadius: '12px',
                   color: 'white',
-                  cursor: 'pointer'
+                  outline: 'none',
+                  boxSizing: 'border-box'
                 }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeleteDriver}
-                disabled={loading}
-                style={{
-                  flex: 1,
-                  padding: '12px',
-                  background: loading ? 'rgba(255, 107, 107, 0.5)' : '#ff5252',
-                  border: 'none',
-                  borderRadius: '8px',
-                  color: 'white',
-                  cursor: loading ? 'not-allowed' : 'pointer'
-                }}
-              >
-                {loading ? 'Deleting...' : 'Delete Driver'}
-              </button>
+                placeholder="Enter driver's phone number"
+              />
             </div>
-          </div>
-        )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                width: '100%',
+                padding: '18px',
+                fontSize: '18px',
+                fontWeight: '600',
+                background: loading ? 'rgba(255, 107, 107, 0.5)' : 'linear-gradient(135deg, #ff6b6b, #ff5252)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '12px',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              {loading ? 'Deleting...' : 'Delete Driver'}
+            </button>
+          </form>
+        </div>
 
         {/* Response */}
         {response && (
