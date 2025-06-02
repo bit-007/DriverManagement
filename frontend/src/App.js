@@ -8,6 +8,8 @@ import Payment from './pages/Payment';
 import Subscribe from './pages/Subscribe';
 import TransactionHistory from './pages/TransactionHistory';
 import Locations from './pages/Locations';
+import DeleteDriver from './pages/DeleteDriver'; // Add this import
+
 
 function App() {
   return (
@@ -21,6 +23,7 @@ function App() {
           <Route path="/subscribe" component={Subscribe} />
           <Route path="/transaction-history" component={TransactionHistory} />
           <Route path="/locations" component={Locations} />
+          <Route path="/delete-driver" component={DeleteDriver} />
         </Switch>
       </div>
     </Router>

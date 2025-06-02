@@ -44,7 +44,8 @@ const HomePage = () => {
               { to: '/subscribe', text: 'Subscribe' },
               { to: '/payment', text: 'Pay' },
               { to: '/transaction-history', text: 'History' },
-              { to: '/locations', text: 'Locations' }
+              { to: '/locations', text: 'Locations' },
+              { to: '/delete-driver', text: 'Delete Driver' }
             ].map((link, index) => (
               <Link
                 key={index}

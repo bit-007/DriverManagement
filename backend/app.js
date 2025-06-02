@@ -354,6 +354,62 @@ app.get("/TransactionHistory/:phone", async (request, response) => {
   }
 });
 
+// Delete driver by phone number
+app.delete("/DeleteDriver/:phone", async (request, response) => {
+  if (!isConnected) {
+    response.status(500).json({ error: 'Database connection not established' });
+    return;
+  }
+
+  const phone = request.params.phone;
+
+  if (!phone || phone.length === 0) {
+    response.status(400).json({ error: 'Invalid phone number' });
+    return;
+  }
+
+  // Validate Indian phone number format
+  const phoneRegex = /^[789]\d{9}$/;
+  if (!phoneRegex.test(phone)) {
+    response.status(400).json({ error: 'Invalid phone number format' });
+    return;
+  }
+
+  try {
+    const collection = db.collection(dbConfig.collectionName);
+    const driver = await collection.findOne({ phone: phone });
+    
+    if (!driver) {
+      response.status(404).json({ error: 'Driver not found' });
+      return;
+    }
+
+    // Delete from drivers collection
+    const deleteResult = await collection.deleteOne({ phone: phone });
+    
+    if (deleteResult.deletedCount === 1) {
+      // Also delete transaction history for this driver
+      const transactionCollection = db.collection(dbConfig.collectionName2);
+      const transactionDeleteResult = await transactionCollection.deleteMany({ driverId: driver._id });
+      
+      response.json({ 
+        message: 'Driver deleted successfully',
+        deletedDriver: {
+          name: driver.name,
+          phone: driver.phone,
+          licenseNumber: driver.licenseNumber
+        },
+        transactionsDeleted: transactionDeleteResult.deletedCount
+      });
+    } else {
+      response.status(500).json({ error: 'Failed to delete driver' });
+    }
+  } catch (err) {
+    console.log('Error deleting driver:', err);
+    response.status(500).json({ error: 'Error deleting driver' });
+  }
+});
+
 
 
 
@@ -414,6 +470,7 @@ app.get('/', (req, res) => {
       'POST /PayBalance/:phone': 'Pay driver balance',
       'POST /Subscribe': 'Add subscription balance',
       'GET /TransactionHistory/:phone': 'Get transaction history',
+      'DELETE /DeleteDriver/:phone': 'Delete driver by phone',
       'GET /health': 'Health check endpoint',
       'GET /api/info': 'API information'
     },
