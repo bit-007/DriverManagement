@@ -346,6 +346,42 @@ app.get("/TransactionHistory/:phone", async (request, response) => {
 });
 
 
+// Delete driver by phone number
+app.delete("/DeleteDriver/:phone", async (request, response) => {
+  if (!isConnected) {
+    response.status(500).json({ error: 'Database connection not established' });
+    return;
+  }
+
+  const phone = request.params.phone;
+
+  if (!phone || phone.length === 0) {
+    response.status(400).json({ error: 'Invalid phone number' });
+    return;
+  }
+
+  try {
+    const collection = db.collection(dbConfig.collectionName);
+    const result = await collection.deleteOne({ phone: phone });
+
+    if (result.deletedCount === 0) {
+      response.status(404).json({ message: 'Driver not found' });
+      return;
+    }
+
+    // Optionally, delete transaction history as well
+    if (dbConfig.collectionName2) {
+      const transactionHistoryCollection = db.collection(dbConfig.collectionName2);
+      await transactionHistoryCollection.deleteMany({ phone: phone });
+    }
+
+    response.json({ message: 'Driver deleted successfully' });
+  } catch (err) {
+    console.log('Error deleting driver:', err);
+    response.status(500).json({ error: 'Error deleting driver' });
+  }
+});
+
 
 
 // Health check endpoint for monitoring and CD pipeline
@@ -375,7 +411,8 @@ app.get('/health', (req, res) => {
         '/PayBalance/:phone',
         '/Subscribe',
         '/TransactionHistory/:phone',
-        '/MultipleByName'
+        '/MultipleByName',
+        '/DeleteDriver/:phone'
       ]
     };
     
@@ -403,6 +440,7 @@ app.get('/api/info', (req, res) => {
       'POST /PayBalance/:phone': 'Pay driver balance',
       'POST /Subscribe': 'Add subscription balance',
       'GET /TransactionHistory/:phone': 'Get transaction history',
+      'DELETE /DeleteDriver/:phone': 'Delete driver by phone number',
       'GET /health': 'Health check endpoint',
       'GET /api/info': 'API information'
     },
