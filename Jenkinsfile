@@ -109,33 +109,34 @@ pipeline {
                     echo "Building backend Docker image..."
                     docker build -t energyhive-backend:${BUILD_NUMBER} ./backend
                     docker tag energyhive-backend:${BUILD_NUMBER} energyhive-backend:latest
-                    
                     echo "Building frontend Docker image..."
                     docker build -t energyhive-frontend:${BUILD_NUMBER} ./frontend
                     docker tag energyhive-frontend:${BUILD_NUMBER} energyhive-frontend:latest
-                    
                     echo "Docker images built successfully!"
                     docker images | grep energyhive
                 '''
             }
         }
-        
+
         stage('Deploy with Docker Compose') {
             steps {
                 echo 'Deploying application with Docker Compose...'
-                sh '''
+                 sh '''
                     echo "Stopping existing containers..."
-                    docker-compose down || echo "No existing containers to stop"
-                    
+                    docker-compose down --remove-orphans || echo "No existing containers to stop"
+            
+                    echo "Force removing any conflicting containers..."
+                    docker rm -f energyhive-backend-v2 energyhive-frontend-v2 2>/dev/null || true
+            
                     echo "Cleaning up old containers and images..."
                     docker container prune -f || echo "Container cleanup completed"
-                    
+            
                     echo "Starting new deployment..."
-                    docker-compose up -d
-                    
+                    docker-compose up -d --force-recreate
+            
                     echo "Waiting for services to be ready..."
                     sleep 30
-                    
+            
                     echo "Checking container status..."
                     docker-compose ps
                 '''
