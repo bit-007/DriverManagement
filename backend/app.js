@@ -70,7 +70,7 @@ app.post("/AddDriver", async (request, response) => {
     name: request.body.name,
     phone: request.body.phone,
     licenseNumber: request.body.licenseNumber,
-    balance: 500
+    balance: 0
   };
 
   try {
