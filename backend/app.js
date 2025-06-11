@@ -70,7 +70,7 @@ app.post("/AddDriver", async (request, response) => {
     name: request.body.name,
     phone: request.body.phone,
     licenseNumber: request.body.licenseNumber,
-    balance: 0
+    balance: 500
   };
 
   try {
@@ -273,15 +273,18 @@ async function saveTransactionHistory(phoneNumber, transactionType, amount) {
   }
 }
 // Subscribe and add balance
+// Subscribe and add balance
 app.post("/Subscribe", async (request, response) => {
   const { phone, subscriptionAmount } = request.body;
 
-  if (!phone || !subscriptionAmount) {
+  // UPDATED: Changed validation to allow undefined and check for required fields
+  if (!phone || subscriptionAmount === undefined) {
     return response.status(400).json({ error: 'Phone and subscription amount are required' });
   }
 
-  if (subscriptionAmount !== 500 && subscriptionAmount !== 1000) {
-    return response.status(400).json({ error: 'Invalid subscription amount. Must be 500 or 1000' });
+  // NEW: Allow 0 for free subscription (previously only allowed 500, 1000)
+  if (![0, 500, 1000].includes(subscriptionAmount)) {
+    return response.status(400).json({ error: 'Invalid subscription amount. Must be 0 (free), 500 or 1000' });
   }
 
   try {
@@ -292,21 +295,31 @@ app.post("/Subscribe", async (request, response) => {
       return response.status(404).json({ error: 'Driver not found' });
     }
 
-    // Check if the existing balance exceeds the limit
-    if (driver.balance >= 3000) {
+    // NEW: For paid subscriptions, check balance limit (free subscriptions skip this check)
+    if (subscriptionAmount > 0 && driver.balance >= 3000) {
       return response.status(400).json({ error: 'Cant Subscribe, Balance already exceeds 3000' });
     }
 
-    const newBalance = driver.balance + subscriptionAmount;
-    await collection.updateOne({ phone: phone }, { $set: { balance: newBalance } });
+    let newBalance = driver.balance;
+    // NEW: Only update balance for paid subscriptions (subscriptionAmount > 0)
+    if (subscriptionAmount > 0) {
+      newBalance += subscriptionAmount;
+      await collection.updateOne({ phone: phone }, { $set: { balance: newBalance } });
+    }
 
-    // Save transaction history
+    // NEW: Save transaction history for ALL subscriptions (including free ones)
     await saveTransactionHistory(phone, "subscription", subscriptionAmount);
 
-    // Generate an invoice after a successful subscription
-    generateInvoice(driver, "subscription", subscriptionAmount, new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)); // expire in 30 days
+    // NEW: Generate invoice for ALL subscriptions (including free ones)
+    generateInvoice(driver, "subscription", subscriptionAmount, new Date(Date.now() + 30 * 24 * 60 * 60 * 1000));
 
-    response.json({ message: `Subscription successful. Balance updated to ${newBalance}` });
+    // NEW: Different response message based on subscription type
+    response.json({ 
+      message: subscriptionAmount === 0 
+        ? 'Free subscription successful' 
+        : `Subscription successful. Balance updated to ${newBalance}`,
+      balance: newBalance
+    });
   } catch (err) {
     console.log('Error subscribing and adding balance:', err);
     response.status(500).json({ error: 'Error subscribing and adding balance' });

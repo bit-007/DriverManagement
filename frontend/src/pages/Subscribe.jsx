@@ -1,7 +1,4 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
-import { API_BASE_URL } from '../config/api';
 
 const Subscribe = () => {
   const [formData, setFormData] = useState({
@@ -15,13 +12,20 @@ const Subscribe = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const result = await axios.post(`${API_BASE_URL}/Subscribe`, {
-        phone: formData.phone,
-        subscriptionAmount: parseInt(formData.subscriptionAmount, 10)
+      const result = await fetch('http://localhost:3000/Subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          phone: formData.phone,
+          subscriptionAmount: parseInt(formData.subscriptionAmount, 10)
+        })
       });
-      setResponse(JSON.stringify(result.data, null, 2));
+      const data = await result.json();
+      setResponse(JSON.stringify(data, null, 2));
     } catch (error) {
-      setResponse(error.response ? JSON.stringify(error.response.data, null, 2) : error.message);
+      setResponse(error.message);
     } finally {
       setLoading(false);
     }
@@ -36,18 +40,30 @@ const Subscribe = () => {
 
   const plans = [
     {
+      value: '0',
+      price: 'FREE',
+      title: 'FREE TRIAL',
+      features: ['7 Days Trial', 'Basic Support', 'Core Features', 'No Payment Required'],
+      popular: false,
+      badge: 'Try Free',
+      color: '#10b981'
+    },
+    {
       value: '500',
       price: '₹500',
       title: 'VALUE PACK',
       features: ['Basic Support', '30 Days Validity', 'Essential Features'],
-      popular: false
+      popular: false,
+      color: '#f59e0b'
     },
     {
       value: '1000',
       price: '₹1000',
       title: 'PREMIUM PACK',
       features: ['Priority Support', '30 Days Validity', 'All Features', 'Extended Benefits'],
-      popular: true
+      popular: true,
+      badge: 'Most Popular',
+      color: '#00f5ff'
     }
   ];
 
@@ -61,24 +77,26 @@ const Subscribe = () => {
     }}>
       {/* Back Navigation */}
       <div style={{ marginBottom: '40px' }}>
-        <Link
-          to="/"
+        <button
+          onClick={() => window.history.back()}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
             color: '#00f5ff',
-            textDecoration: 'none',
+            background: 'none',
+            border: 'none',
             fontSize: '16px',
             fontWeight: '500',
+            cursor: 'pointer',
             transition: 'all 0.3s ease'
           }}
         >
           ← Back to Home
-        </Link>
+        </button>
       </div>
 
-      <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
+      <div style={{ maxWidth: '1100px', margin: '0 auto', textAlign: 'center' }}>
         {/* Header */}
         <div style={{ marginBottom: '60px' }}>
           <h1 style={{
@@ -96,15 +114,15 @@ const Subscribe = () => {
             fontSize: '20px',
             lineHeight: '1.6'
           }}>
-            Select the perfect subscription plan for your needs
+            Start with a free trial or select a premium plan
           </p>
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <div onSubmit={handleSubmit}>
           {/* Plans Grid */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
             gap: '30px',
             marginBottom: '50px'
           }}>
@@ -114,30 +132,32 @@ const Subscribe = () => {
                 style={{
                   position: 'relative',
                   background: formData.subscriptionAmount === plan.value 
-                    ? 'linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(0, 102, 255, 0.2))'
+                    ? `linear-gradient(135deg, ${plan.color}20, ${plan.color}10)`
                     : 'rgba(255, 255, 255, 0.05)',
                   backdropFilter: 'blur(20px)',
                   borderRadius: '20px',
                   padding: '40px 30px',
                   border: formData.subscriptionAmount === plan.value 
-                    ? '2px solid #00f5ff' 
+                    ? `2px solid ${plan.color}` 
                     : '1px solid rgba(255, 255, 255, 0.1)',
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
                   transform: formData.subscriptionAmount === plan.value ? 'translateY(-8px)' : 'translateY(0)',
                   boxShadow: formData.subscriptionAmount === plan.value 
-                    ? '0 20px 40px rgba(0, 245, 255, 0.3)' 
+                    ? `0 20px 40px ${plan.color}30` 
                     : '0 10px 30px rgba(0, 0, 0, 0.3)'
                 }}
                 onClick={() => setFormData({...formData, subscriptionAmount: plan.value})}
               >
-                {plan.popular && (
+                {plan.badge && (
                   <div style={{
                     position: 'absolute',
                     top: '-12px',
                     left: '50%',
                     transform: 'translateX(-50%)',
-                    background: 'linear-gradient(135deg, #00f5ff, #0066ff)',
+                    background: plan.popular 
+                      ? 'linear-gradient(135deg, #00f5ff, #0066ff)'
+                      : 'linear-gradient(135deg, #10b981, #059669)',
                     color: 'white',
                     padding: '6px 20px',
                     borderRadius: '20px',
@@ -146,11 +166,16 @@ const Subscribe = () => {
                     textTransform: 'uppercase',
                     letterSpacing: '1px'
                   }}>
-                    Most Popular
+                    {plan.badge}
                   </div>
                 )}
 
-                <div style={{ fontSize: '3rem', fontWeight: '800', color: '#00f5ff', marginBottom: '8px' }}>
+                <div style={{ 
+                  fontSize: plan.value === '0' ? '2.5rem' : '3rem', 
+                  fontWeight: '800', 
+                  color: plan.color, 
+                  marginBottom: '8px' 
+                }}>
                   {plan.price}
                 </div>
 
@@ -179,7 +204,7 @@ const Subscribe = () => {
                         width: '6px',
                         height: '6px',
                         borderRadius: '50%',
-                        background: '#00f5ff'
+                        background: plan.color
                       }} />
                       {feature}
                     </div>
@@ -198,15 +223,19 @@ const Subscribe = () => {
                     value={plan.value}
                     checked={formData.subscriptionAmount === plan.value}
                     onChange={handleChange}
-                    style={{ width: '20px', height: '20px' }}
+                    style={{ 
+                      width: '20px', 
+                      height: '20px',
+                      accentColor: plan.color
+                    }}
                     required
                   />
                   <span style={{
                     fontSize: '16px',
                     fontWeight: '600',
-                    color: formData.subscriptionAmount === plan.value ? '#00f5ff' : 'rgba(255, 255, 255, 0.7)'
+                    color: formData.subscriptionAmount === plan.value ? plan.color : 'rgba(255, 255, 255, 0.7)'
                   }}>
-                    Select Plan
+                    {plan.value === '0' ? 'Start Free Trial' : 'Select Plan'}
                   </span>
                 </div>
               </div>
@@ -248,26 +277,121 @@ const Subscribe = () => {
 
           {/* Submit Button */}
           <button
-            type="submit"
-            disabled={loading}
+            onClick={handleSubmit}
+            disabled={loading || !formData.phone || !formData.subscriptionAmount}
             style={{
               padding: '18px 40px',
               fontSize: '18px',
               fontWeight: '600',
-              background: loading ? 'rgba(0, 245, 255, 0.5)' : 'linear-gradient(135deg, #00f5ff, #0066ff)',
+              background: loading 
+                ? 'rgba(0, 245, 255, 0.5)' 
+                : formData.subscriptionAmount === '0'
+                  ? 'linear-gradient(135deg, #10b981, #059669)'
+                  : 'linear-gradient(135deg, #00f5ff, #0066ff)',
               color: 'white',
               border: 'none',
               borderRadius: '12px',
-              cursor: loading ? 'not-allowed' : 'pointer',
+              cursor: loading || !formData.phone || !formData.subscriptionAmount ? 'not-allowed' : 'pointer',
               transition: 'all 0.3s ease',
               boxShadow: '0 8px 32px rgba(0, 245, 255, 0.3)',
               textTransform: 'uppercase',
-              letterSpacing: '1px'
+              letterSpacing: '1px',
+              opacity: !formData.phone || !formData.subscriptionAmount ? 0.6 : 1
             }}
           >
-            {loading ? 'Processing...' : 'Subscribe Now'}
+            {loading 
+              ? 'Processing...' 
+              : formData.subscriptionAmount === '0' 
+                ? 'Start Free Trial' 
+                : 'Subscribe Now'
+            }
           </button>
-        </form>
+        </div>
+
+        {/* Features Comparison */}
+        <div style={{
+          marginTop: '80px',
+          padding: '40px',
+          background: 'rgba(255, 255, 255, 0.05)',
+          borderRadius: '20px',
+          border: '1px solid rgba(255, 255, 255, 0.1)'
+        }}>
+          <h3 style={{
+            fontSize: '24px',
+            fontWeight: '700',
+            marginBottom: '30px',
+            color: 'white'
+          }}>
+            Why Start with Free Trial?
+          </h3>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+            gap: '30px',
+            textAlign: 'left'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px' }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '10px',
+                background: 'linear-gradient(135deg, #10b981, #059669)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '20px'
+              }}>
+                🚀
+              </div>
+              <div>
+                <h4 style={{ color: 'white', marginBottom: '8px', fontSize: '18px' }}>No Risk</h4>
+                <p style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '14px', margin: 0 }}>
+                  Try all features without any payment commitment
+                </p>
+              </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px' }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '10px',
+                background: 'linear-gradient(135deg, #10b981, #059669)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '20px'
+              }}>
+                ⚡
+              </div>
+              <div>
+                <h4 style={{ color: 'white', marginBottom: '8px', fontSize: '18px' }}>Instant Access</h4>
+                <p style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '14px', margin: 0 }}>
+                  Get started immediately with full system access
+                </p>
+              </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px' }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '10px',
+                background: 'linear-gradient(135deg, #10b981, #059669)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '20px'
+              }}>
+                🎯
+              </div>
+              <div>
+                <h4 style={{ color: 'white', marginBottom: '8px', fontSize: '18px' }}>Test Drive</h4>
+                <p style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '14px', margin: 0 }}>
+                  Evaluate if the platform meets your needs
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Response Display */}
         {response && (
